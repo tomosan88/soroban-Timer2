@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>そろばんタイマー</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <h1>そろばんタイマー</h1>
+        <div id="menu-icon">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <div id="status"></div>
+        <div id="timer-display">7:00</div>
+        
+        <div id="cycle-container">
+            <!-- ▼▼▼ ここをdivに置き換える ▼▼▼ -->
+            <div id="cycle-display">
+                <!-- JavaScriptがここに「3 / 8」のようなテキストを挿入します -->
+            </div>
+            <!-- ▲▲▲ ここまで ▲▲▲ -->
+        </div>
+
+        <div class="buttons">
+            <button id="startButton">スタート</button>
+            <button id="stopButton">ストップ</button>
+            <button id="resetButton">リセット</button>
+        </div>
+    </div>
+
+    <!-- ▼▼▼ ここに設定画面のHTMLを追記 ▼▼▼ -->
+    <div id="settings-modal" class="hidden">
+        <div class="modal-content">
+            <h2>設定</h2>
+
+<fieldset>
+    <legend>タイマー設定</legend>
+    
+    <div id="duration-settings">
+        <!-- ここに各回の時間設定がJSによって作られます -->
+    </div>
+</fieldset>
+            
+<fieldset>
+    <legend>背景色</legend>
+    <!-- ▼▼▼ このdivを追加 ▼▼▼ -->
+    <div class="radio-options-container">
+        <div>
+            <input type="radio" id="bg-white" name="background-color" value="white" checked>
+            <label for="bg-white">白</label>
+        </div>
+        <div>
+            <input type="radio" id="bg-gray" name="background-color" value="gray">
+            <label for="bg-gray">グレー</label>
+        </div>
+        <div>
+            <input type="radio" id="bg-black" name="background-color" value="black">
+            <label for="bg-black">黒</label>
+        </div>
+    </div>
+    <!-- ▲▲▲ このdivを追加 ▲▲▲ -->
+</fieldset>
+            
+<fieldset>
+    <legend>音声</legend>
+    <!-- ▼▼▼ このdivを追加 ▼▼▼ -->
+    <div class="radio-options-container">
+        <div>
+            <input type="radio" id="voice-low" name="voice-type" value="low" checked>
+            <label for="voice-low">低い声</label>
+        </div>
+        <div>
+            <input type="radio" id="voice-high" name="voice-type" value="high">
+            <label for="voice-high">高い声</label>
+        </div>
+    </div>
+    <!-- ▲▲▲ このdivを追加 ▲▲▲ -->
+</fieldset>
+
+            <hr> 
+
+            <button id="install-button" class="hidden">
+                 ↓ アプリをホーム画面に追加
+            </button>
+
+            <h3>ライセンス</h3>
+            <p>音声: VOICEVOX: 四国めたん / 玄野武宏</p>
+            
+            <button id="close-button">閉じる</button>
+        </div>
+    </div>
+    <!-- ▲▲▲ ここまで ▲▲▲ -->
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;         /* ← 追加: 画面幅の90%を使う */
+    max-width: 350px;   /* ← 変更: でも最大幅は350pxまでね！ */
+    height: 450px;
+    position: relative; 
+}
+
+h1 {
+    color: #333;
+}
+
+#status {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    transition: font-size 0.3s ease-in-out;
+    height: 1.5em;
+}
+
+#timer-display {
+    font-size: 5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #4CAF50;
+    height: 1.2em;
+    line-height: 1.2em;
+}
+
+#cycle-display {
+    font-size: 1.5em; /* 少し大きめの文字にする */
+    font-weight: bold;
+    color: #555;      /* 少し濃いめのグレー */
+    margin-bottom: 20px;
+    height: 1.5em;     /* 高さを確保して、表示/非表示でもレイアウトがガタつかないように */
+    line-height: 1.5em;
+}
+
+/* --- ボタンのレイアウト --- */
+.buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.buttons button {
+    padding: 10px 10px;
+    font-size: 1em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    text-align: center;
+}
+
+/* --- 3点リーダーのアイコン --- */
+#menu-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
+#menu-icon .dot {
+    width: 5px;
+    height: 5px;
+    background-color: #333;
+    border-radius: 50%;
+    margin: 4px 0;
+}
+
+#startButton { background-color: #4CAF50; }
+#stopButton { background-color: #f44336; }
+#resetButton { background-color: #555; }
+
+
+/* --- ▼▼▼ ここから設定モーダル用のスタイルを追記 ▼▼▼ --- */
+
+/* モーダル全体（背景の半透明な黒） */
+#settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* JSでこのクラスが付いたら、モーダル全体を非表示にする */
+#settings-modal.hidden {
+    display: none;
+}
+
+/* モーダルのコンテンツ部分（白い四角） */
+.modal-content {
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: #333; /* 黒背景にしたときに文字色が白のままにならないように */
+}
+
+/* --- 設定項目を見やすくするスタイル --- */
+.modal-content h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.modal-content fieldset {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.modal-content legend {
+    font-weight: bold;
+    padding: 0 10px;
+}
+
+.modal-content label {
+    margin-left: 8px;
+}
+
+/* 閉じるボタン */
+#close-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#close-button:hover {
+    background-color: #45a049;
+}
+
+/* --- ▼▼▼ 時間設定を2列にするスタイル ▼▼▼ --- */
+
+#duration-settings {
+  display: grid; /* グリッドレイアウトを有効にする */
+  grid-template-columns: 1fr 1fr; /* 2つの均等な幅の列を作る */
+  gap: 15px 20px; /* 縦(15px)と横(20px)の隙間をあける */
+  margin-top: 10px; /* 上の見出しとの間に少し余白をとる */
+}
+
+/* --- ▲▲▲ ここまで ▲▲▲ --- */
+
+/* --- ▼▼▼ カスタムドロップダウンのスタイル ▼▼▼ --- */
+
+/* ラベルとプルダウンを横並びにして中央揃えにする */
+#duration-settings > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 要素間にスペースを空ける */
+}
+
+/* select要素を囲むラッパー(これがガワになる) */
+.custom-select-wrapper {
+    position: relative; /* 矢印を配置するための基準点 */
+    width: 90px;        /* プルダウンの横幅 */
+}
+
+/* select本体のスタイル */
+.custom-select-wrapper select {
+    /* まず、OS標準の見た目を完全に消す */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    
+    /* オリジナルの見た目を作る */
+    width: 100%;
+    padding: 8px 30px 8px 12px; /* 右側に矢印アイコン用の余白を確保 */
+    font-size: 1em;
+    color: #333;
+    background-color: #f0f0f0; /* 背景色を少しグレーに */
+    border: 1px solid #ccc;
+    border-radius: 8px; /* 角を丸くする */
+    cursor: pointer;
+    outline: none; /* クリック時の青い枠線を消す */
+    transition: border-color 0.2s, box-shadow 0.2s; /* なめらかな変化 */
+}
+
+/* マウスが乗った時のスタイル */
+.custom-select-wrapper select:hover {
+    border-color: #4CAF50; /* 緑色の枠線 */
+}
+
+/* クリックして選択中のスタイル */
+.custom-select-wrapper select:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* ほんのり光るエフェクト */
+}
+
+/* 矢印アイコンをCSSで描画 */
+.custom-select-wrapper::after {
+    content: '▼'; /* 表示する文字 */
+    font-size: 12px;
+    color: #555;
+    
+    /* 位置を右端の中央に固定 */
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    
+    pointer-events: none; /* 矢印自体がクリックされるのを防ぐ */
+}
+/* --- ▲▲▲ ここまで ▲▲▲ --- */
+
+/* --- ▼▼▼ ラジオボタンを横並びにするスタイル ▼▼▼ --- */
+
+.radio-options-container {
+  display: flex;         /* フレックスボックスを有効にし、中身を横並びにする */
+  justify-content: center; /* 中央揃えにする */
+  gap: 20px;             /* 各選択肢の間に20pxの隙間をあける */
+  margin-top: 5px;         /* 上の見出しとの間に少し余白をとる */
+}
+
+/* --- ▲▲▲ ここまで ▲▲▲ --- */
+
+/* --- ▼▼▼ インストールボタンのスタイル ▼▼▼ --- */
+#install-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px; /* 下のライセンス表示との間に隙間をあける */
+  border: 2px solid #007bff; /* 青い枠線 */
+  background-color: #fff;
+  color: #007bff;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#install-button:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* JavaScriptでこのクラスが付いたら、ボタンを非表示にする */
+#install-button.hidden {
+  display: none;
+}
