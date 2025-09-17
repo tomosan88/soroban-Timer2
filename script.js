@@ -253,7 +253,7 @@ voiceTypeRadios.forEach(radio => {
 const durationSettingsDiv = document.getElementById('duration-settings');
 
 // 時間設定の選択肢（0を「なし」として追加）
-const timeOptions = [0, 3, 5, 7, 10];
+const timeOptions = [0, 2, 3, 5, 7, 10];
 const defaultWorkTime = 7; // 「なし」から時間アリに戻す際のデフォルト値
 
 // 時間設定のUIを生成・再描画する関数
