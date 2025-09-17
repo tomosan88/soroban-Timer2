@@ -281,8 +281,12 @@ function createDurationInputs() {
         const select = document.createElement('select');
         select.dataset.cycleIndex = i;
 
-        // 3. selectの中にoption要素を追加していく
-        timeOptions.forEach(time => {
+// このプルダウンで使う選択肢の配列を決める
+        // 1回目(iが0)なら、0を除いた配列を使い、それ以外は元の配列を使う
+        const currentOptions = (i === 0) ? timeOptions.filter(t => t > 0) : timeOptions;
+
+        // 3. 決定した選択肢の配列を使ってoption要素を追加していく
+        currentOptions.forEach(time => {
             const option = document.createElement('option');
             option.value = time;
             option.textContent = time === 0 ? 'なし' : `${time}分`;
@@ -290,7 +294,7 @@ function createDurationInputs() {
                 option.selected = true;
             }
             select.appendChild(option);
-        });
+        })
 
         // 4. selectの値が変更されたときのイベント処理
         select.addEventListener('change', (event) => {

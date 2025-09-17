@@ -248,7 +248,8 @@ h1 {
   display: block;
   width: 100%;
   padding: 10px;
-  margin-bottom: 20px; /* 下のライセンス表示との間に隙間をあける */
+  margin-top: 15px;    /* 上（サイクル表示）との隙間 */
+  margin-bottom: 15px; /* 下（スタートボタン達）との隙間 */
   border: 2px solid #007bff; /* 青い枠線 */
   background-color: #fff;
   color: #007bff;
