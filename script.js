@@ -140,25 +140,26 @@ function handleCycleCompletion() {
     if (isWorking) {
         // --- 作業サイクルが完了した時の処理 ---
         endSound[selectedVoice].play();
-
+        
         // ▼▼▼ ここからが変更点 ▼▼▼
         // これが最後の作業サイクルかどうかをチェック
         if (currentCycle >= activeCycles) {
-            // 最後の作業だったので、休憩に入らずにその場で完了させる
+            // これが最後の作業だったので、休憩に入らずにその場で完了させる
             statusDisplay.textContent = "完了！";
             timerDisplay.textContent = "0:00";
-            timerDisplay.style.color = "#333"; // 文字色を通常に戻す
+            timerDisplay.style.color = "#333";
+            cycleDisplay.textContent = `${activeCycles} / ${activeCycles}`; // サイクル表示を最終状態に固定
             releaseWakeLock();
-
-        } else {
-            // まだ次の作業サイクルがあるので、準備時間（休憩）に入る
-            isWorking = false;
-            remainingTime = breakTime;
-            timerDisplay.style.color = "#ff9800"; // 準備中の色
-            updateUI();
-            if (timerWorker) timerWorker.postMessage({ command: 'start', newDuration: breakTime });
-            isTimerRunning = true;
+            return; // ★★★ この関数をここで完全に終了させるのが重要 ★★★
         }
+
+        // まだ次があるので、準備時間（休憩）に入る
+        isWorking = false;
+        remainingTime = breakTime;
+        timerDisplay.style.color = "#ff9800";
+        updateUI();
+        if (timerWorker) timerWorker.postMessage({ command: 'start', newDuration: breakTime });
+        isTimerRunning = true;
         // ▲▲▲ ここまでが変更点 ▲▲▲
 
     } else {
