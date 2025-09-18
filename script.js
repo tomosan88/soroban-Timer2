@@ -138,32 +138,44 @@ function handleCycleCompletion() {
     const activeCycles = durationSettings.filter(d => d > 0).length;
 
     if (isWorking) {
+        // --- 作業サイクルが完了した時の処理 ---
         endSound[selectedVoice].play();
-        isWorking = false;
-        remainingTime = breakTime;
-        timerDisplay.style.color = "#ff9800";
-        updateUI();
-        if (timerWorker) timerWorker.postMessage({ command: 'start', newDuration: breakTime });
-        isTimerRunning = true;
-    } else {
-        currentCycle++;
-        if (currentCycle <= activeCycles) {
-            startPrecountdown(() => {
-                isWorking = true;
-                const activeDurations = durationSettings.filter(d => d > 0);
-                const nextDuration = activeDurations[currentCycle - 1] * 60;
-                remainingTime = nextDuration;
-                timerDisplay.style.color = workColor;
-                updateUI();
-                if (timerWorker) timerWorker.postMessage({ command: 'start', newDuration: nextDuration });
-                isTimerRunning = true;
-            });
-        } else {
+
+        // ▼▼▼ ここからが変更点 ▼▼▼
+        // これが最後の作業サイクルかどうかをチェック
+        if (currentCycle >= activeCycles) {
+            // 最後の作業だったので、休憩に入らずにその場で完了させる
             statusDisplay.textContent = "完了！";
             timerDisplay.textContent = "0:00";
-            timerDisplay.style.color = "#333";
+            timerDisplay.style.color = "#333"; // 文字色を通常に戻す
             releaseWakeLock();
+
+        } else {
+            // まだ次の作業サイクルがあるので、準備時間（休憩）に入る
+            isWorking = false;
+            remainingTime = breakTime;
+            timerDisplay.style.color = "#ff9800"; // 準備中の色
+            updateUI();
+            if (timerWorker) timerWorker.postMessage({ command: 'start', newDuration: breakTime });
+            isTimerRunning = true;
         }
+        // ▲▲▲ ここまでが変更点 ▲▲▲
+
+    } else {
+        // --- 準備時間（休憩）が完了した時の処理 ---
+        currentCycle++;
+        
+        // 休憩が終わったので、次の作業サイクルを開始する
+        startPrecountdown(() => {
+            isWorking = true;
+            const activeDurations = durationSettings.filter(d => d > 0);
+            const nextDuration = activeDurations[currentCycle - 1] * 60;
+            remainingTime = nextDuration;
+            timerDisplay.style.color = workColor;
+            updateUI();
+            if (timerWorker) timerWorker.postMessage({ command: 'start', newDuration: nextDuration });
+            isTimerRunning = true;
+        });
     }
 }
 
