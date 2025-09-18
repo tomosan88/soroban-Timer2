@@ -27,6 +27,46 @@ let remainingTime = durationSettings[0] * 60;
 let isTimerRunning = false;
 let isPaused = false;
 let isTimerEverStarted = false;
+let isAudioUnlocked = false;
+
+// script.js の上の方に、動画再生用の要素を作る
+const silentVideo = document.createElement('video');
+silentVideo.setAttribute('playsinline', '');
+silentVideo.setAttribute('muted', '');
+silentVideo.src = "data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28yYXZjMQAAAAhmcmVlAAAAG21kYXQAAAGzABAHAAABthAz//+00A/wAARgBgABgBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAYc2FtcHJfYXVkaW8AAAAAAAABAAAACGF2Y0Mx........."; // (ここに非常に短い無音動画のデータが入ります。このままコピペでOK)
+silentVideo.loop = true;
+document.body.appendChild(silentVideo); // 画面には見えない
+
+// --- Wake Lock API 関連の関数 ---
+async function requestWakeLock() {
+    // まずはWake Lockを試す (Android向け)
+    if ('wakeLock' in navigator) {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Wake Lock is active.');
+            wakeLock.addEventListener('release', () => console.log('Wake Lock was released.'));
+            return; // Wake Lockが成功したらここで終わり
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
+    }
+
+    // Wake Lockが失敗した場合 (iPhoneなど) の代替策
+    console.log('Wake Lock not supported, falling back to video method.');
+    silentVideo.play().catch(e => console.error("Video fallback failed:", e));
+}
+
+async function releaseWakeLock() {
+    // Wake Lockを解放 (Android向け)
+    if (wakeLock !== null) {
+        await wakeLock.release();
+        wakeLock = null;
+        return;
+    }
+    
+    // 代替策の動画を停止 (iPhoneなど)
+    silentVideo.pause();
+}
 
 // --- Web WorkerとWake Lockの初期化 ---
 let timerWorker = null;
@@ -34,26 +74,6 @@ if (window.Worker) {
     timerWorker = new Worker('timer-worker.js');
 }
 let wakeLock = null;
-
-// --- Wake Lock API 関連の関数 ---
-async function requestWakeLock() {
-    if ('wakeLock' in navigator) {
-        try {
-            wakeLock = await navigator.wakeLock.request('screen');
-            console.log('Wake Lock is active.');
-            wakeLock.addEventListener('release', () => console.log('Wake Lock was released.'));
-        } catch (err) {
-            console.error(`${err.name}, ${err.message}`);
-        }
-    }
-}
-
-async function releaseWakeLock() {
-    if (wakeLock !== null) {
-        await wakeLock.release();
-        wakeLock = null;
-    }
-}
 
 // --- UI更新関数 ---
 function formatTime(seconds) {
@@ -148,6 +168,23 @@ function handleCycleCompletion() {
 
 // --- イベントリスナー (Workerにメッセージを送る) ---
 startButton.addEventListener("click", () => {
+        // 最初のクリック時だけ、すべてのオーディオをアンロックする
+    if (!isAudioUnlocked) {
+        try {
+            for (const key in preSound) {
+                preSound[key].play();
+                preSound[key].pause();
+            }
+            for (const key in endSound) {
+                endSound[key].play();
+                endSound[key].pause();
+            }
+            isAudioUnlocked = true;
+            console.log('Audio context unlocked.');
+        } catch (e) {
+            console.error('Failed to unlock audio:', e);
+        }
+    }
     if (isTimerRunning) return;
     isTimerEverStarted = true;
     startButton.disabled = true;
