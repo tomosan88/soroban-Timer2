@@ -1,5 +1,5 @@
 // キャッシュの名前（バージョン）
-const CACHE_NAME = 'soroban-timer-v1';
+const CACHE_NAME = 'soroban-timer-v2';//今日から寒くなるようだ
 
 // オフライン時に利用できるようにキャッシュするファイルのリスト
 const urlsToCache = [
@@ -7,6 +7,7 @@ const urlsToCache = [
   'index.html',
   'style.css',
   'script.js',
+  'timer-worker.js',
   'manifest.json',
   'audio/lstart.wav',
   'audio/lstop.wav',
@@ -29,7 +30,28 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// --- 2. ファイル取得の制御 ---
+// --- 2. 古いキャッシュの削除 ---
+// service-workerが有効化（activate）されたときに実行される
+self.addEventListener('activate', (event) => {
+    // このservice-workerが有効になったら、他の古いバージョンのキャッシュは不要になる
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                // 全てのキャッシュをループで確認
+                cacheNames.map((cacheName) => {
+                    // もし現在のキャッシュ名(CACHE_NAME)と異なっていたら
+                    if (cacheName !== CACHE_NAME) {
+                        // その古いキャッシュを削除する
+                        console.log('古いキャッシュを削除:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+});
+
+// --- 3. ファイル取得の制御 ---
 // ページが何かファイル（画像やJSなど）を要求するたびに実行される
 self.addEventListener('fetch', (event) => {
   event.respondWith(
